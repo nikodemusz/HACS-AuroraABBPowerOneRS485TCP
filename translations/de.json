@@ -1,0 +1,117 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Aurora ABB PowerOne TCP",
+        "description": "Wähle, wie der Wechselrichter angebunden ist.",
+        "data": {
+          "protocol": "Protokoll"
+        }
+      },
+      "tcp": {
+        "title": "Aurora ABB PowerOne über TCP",
+        "description": "Für RS485-zu-TCP-Gateways, die das Aurora-Seriellprotokoll transparent weiterleiten.",
+        "data": {
+          "host": "Host",
+          "tcp_port": "TCP-Port",
+          "address": "Wechselrichter-Adresse",
+          "timeout": "Timeout (Sekunden)"
+        }
+      },
+      "serial": {
+        "title": "Aurora ABB PowerOne über seriell",
+        "description": "Für direkt angeschlossene USB-/RS485-Adapter.",
+        "data": {
+          "port": "Serieller Port",
+          "address": "Wechselrichter-Adresse",
+          "timeout": "Timeout (Sekunden)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen",
+      "cannot_open_serial_port": "Serieller Port konnte nicht geöffnet werden",
+      "invalid_serial_port": "Serieller Port ist ungültig"
+    },
+    "abort": {
+      "already_configured": "Dieser Wechselrichter ist bereits eingerichtet",
+      "no_serial_ports": "Keine seriellen Ports gefunden"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Aurora ABB PowerOne TCP Optionen",
+        "description": "Transportparameter und Abfrageintervall anpassen.",
+        "data": {
+          "host": "Host",
+          "tcp_port": "TCP-Port",
+          "port": "Serieller Port",
+          "address": "Wechselrichter-Adresse",
+          "timeout": "Timeout (Sekunden)",
+          "scan_interval": "Abfrageintervall (Sekunden)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "protocol": {
+      "options": {
+        "tcp": "TCP (RS485-über-TCP-Gateway)",
+        "serial": "Seriell (USB-/RS485-Adapter)"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "grid_voltage": {
+        "name": "Netzspannung"
+      },
+      "grid_current": {
+        "name": "Netzstrom"
+      },
+      "power_output": {
+        "name": "Ausgangsleistung"
+      },
+      "grid_frequency": {
+        "name": "Netzfrequenz"
+      },
+      "power_input_1": {
+        "name": "Eingangsleistung 1"
+      },
+      "power_input_2": {
+        "name": "Eingangsleistung 2"
+      },
+      "temperature": {
+        "name": "Temperatur"
+      },
+      "voltage_input_1": {
+        "name": "Eingangsspannung 1"
+      },
+      "current_input_1": {
+        "name": "Eingangsstrom 1"
+      },
+      "voltage_input_2": {
+        "name": "Eingangsspannung 2"
+      },
+      "current_input_2": {
+        "name": "Eingangsstrom 2"
+      },
+      "r_iso": {
+        "name": "Isolationswiderstand"
+      },
+      "i_leak_dcdc": {
+        "name": "Leckstrom DC/DC"
+      },
+      "i_leak_inverter": {
+        "name": "Leckstrom Wechselrichter"
+      },
+      "total_energy": {
+        "name": "Gesamtenergie"
+      },
+      "alarm": {
+        "name": "Alarm"
+      }
+    }
+  }
+}
