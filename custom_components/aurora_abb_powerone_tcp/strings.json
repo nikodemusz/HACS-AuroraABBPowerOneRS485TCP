@@ -1,0 +1,117 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Aurora ABB PowerOne TCP",
+        "description": "Choose how the inverter is connected.",
+        "data": {
+          "protocol": "Protocol"
+        }
+      },
+      "tcp": {
+        "title": "Aurora ABB PowerOne via TCP",
+        "description": "Use this for RS485-to-TCP gateways that transparently forward the Aurora serial protocol.",
+        "data": {
+          "host": "Host",
+          "tcp_port": "TCP port",
+          "address": "Inverter address",
+          "timeout": "Timeout (seconds)"
+        }
+      },
+      "serial": {
+        "title": "Aurora ABB PowerOne via serial",
+        "description": "Use this for a directly attached USB/RS485 adapter.",
+        "data": {
+          "port": "Serial port",
+          "address": "Inverter address",
+          "timeout": "Timeout (seconds)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Connection failed",
+      "cannot_open_serial_port": "Serial port could not be opened",
+      "invalid_serial_port": "Serial port is invalid"
+    },
+    "abort": {
+      "already_configured": "This inverter is already configured",
+      "no_serial_ports": "No serial ports found"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Aurora ABB PowerOne TCP options",
+        "description": "Adjust transport parameters and polling.",
+        "data": {
+          "host": "Host",
+          "tcp_port": "TCP port",
+          "port": "Serial port",
+          "address": "Inverter address",
+          "timeout": "Timeout (seconds)",
+          "scan_interval": "Polling interval (seconds)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "protocol": {
+      "options": {
+        "tcp": "TCP (RS485 over TCP gateway)",
+        "serial": "Serial (USB / RS485 adapter)"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "grid_voltage": {
+        "name": "Grid voltage"
+      },
+      "grid_current": {
+        "name": "Grid current"
+      },
+      "power_output": {
+        "name": "Power output"
+      },
+      "grid_frequency": {
+        "name": "Grid frequency"
+      },
+      "power_input_1": {
+        "name": "Power input 1"
+      },
+      "power_input_2": {
+        "name": "Power input 2"
+      },
+      "temperature": {
+        "name": "Temperature"
+      },
+      "voltage_input_1": {
+        "name": "Voltage input 1"
+      },
+      "current_input_1": {
+        "name": "Current input 1"
+      },
+      "voltage_input_2": {
+        "name": "Voltage input 2"
+      },
+      "current_input_2": {
+        "name": "Current input 2"
+      },
+      "r_iso": {
+        "name": "Insulation resistance"
+      },
+      "i_leak_dcdc": {
+        "name": "DC/DC leak current"
+      },
+      "i_leak_inverter": {
+        "name": "Inverter leak current"
+      },
+      "total_energy": {
+        "name": "Total energy"
+      },
+      "alarm": {
+        "name": "Alarm"
+      }
+    }
+  }
+}
