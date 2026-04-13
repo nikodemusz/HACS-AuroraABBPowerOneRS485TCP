@@ -183,16 +183,24 @@ class AuroraSensor(CoordinatorEntity[AuroraAbbDataUpdateCoordinator], SensorEnti
     ) -> None:
         super().__init__(coordinator)
         self.entity_description = entity_description
-        self._attr_unique_id = f"{data[ATTR_SERIAL_NUMBER]}_{entity_description.key}"
+
+        serial = str(data.get(ATTR_SERIAL_NUMBER) or "unknown")
+        model = str(data.get(ATTR_MODEL) or "Aurora Inverter")
+        firmware = str(data.get(ATTR_FIRMWARE) or "unknown")
+        device_name = str(data.get(ATTR_DEVICE_NAME) or DEFAULT_DEVICE_NAME)
+
+        self._attr_unique_id = f"{serial}_{entity_description.key}"
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, data[ATTR_SERIAL_NUMBER])},
+            identifiers={(DOMAIN, serial)},
             manufacturer=MANUFACTURER,
-            model=data[ATTR_MODEL],
-            name=data.get(ATTR_DEVICE_NAME, DEFAULT_DEVICE_NAME),
-            sw_version=data[ATTR_FIRMWARE],
+            model=model,
+            name=device_name,
+            sw_version=firmware,
         )
 
     @property
     def native_value(self):
         """Return sensor value from coordinator data."""
+        if not self.coordinator.data:
+            return None
         return self.coordinator.data.get(self.entity_description.key)
