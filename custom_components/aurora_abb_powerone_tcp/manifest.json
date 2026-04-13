@@ -1,12 +1,12 @@
 {
   "domain": "aurora_abb_powerone_tcp",
   "name": "Aurora ABB PowerOne TCP",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "config_flow": true,
   "integration_type": "device",
   "iot_class": "local_polling",
-  "documentation": "https://github.com/YOUR_GITHUB_USERNAME/ha-aurora-abb-powerone-tcp",
-  "issue_tracker": "https://github.com/YOUR_GITHUB_USERNAME/ha-aurora-abb-powerone-tcp/issues",
+  "documentation": "https://github.com/nikodemusz/HACS-AuroraABBPowerOneRS485TCP",
+  "issue_tracker": "https://github.com/nikodemusz/HACS-AuroraABBPowerOneRS485TCP/issues",
   "codeowners": [],
   "requirements": [
     "aurorapy==0.2.7"
