@@ -15,7 +15,7 @@ from homeassistant.components.sensor import (
 from homeassistant.const import (
     ATTR_SERIAL_NUMBER,
     EntityCategory,
-    UnitOfCurrent,
+    UnitOfElectricCurrent,
     UnitOfElectricPotential,
     UnitOfEnergy,
     UnitOfFrequency,
@@ -46,7 +46,7 @@ SENSOR_TYPES: tuple[AuroraSensorEntityDescription, ...] = (
     AuroraSensorEntityDescription(
         key="grid_current",
         device_class=SensorDeviceClass.CURRENT,
-        native_unit_of_measurement=UnitOfCurrent.AMPERE,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="grid_current",
     ),
@@ -98,7 +98,7 @@ SENSOR_TYPES: tuple[AuroraSensorEntityDescription, ...] = (
     AuroraSensorEntityDescription(
         key="current_in_1",
         device_class=SensorDeviceClass.CURRENT,
-        native_unit_of_measurement=UnitOfCurrent.AMPERE,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="current_input_1",
         entity_registry_enabled_default=False,
@@ -114,7 +114,7 @@ SENSOR_TYPES: tuple[AuroraSensorEntityDescription, ...] = (
     AuroraSensorEntityDescription(
         key="current_in_2",
         device_class=SensorDeviceClass.CURRENT,
-        native_unit_of_measurement=UnitOfCurrent.AMPERE,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="current_input_2",
         entity_registry_enabled_default=False,
@@ -129,7 +129,7 @@ SENSOR_TYPES: tuple[AuroraSensorEntityDescription, ...] = (
     ),
     AuroraSensorEntityDescription(
         key="i_leak_dcdc",
-        native_unit_of_measurement=UnitOfCurrent.AMPERE,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="i_leak_dcdc",
         entity_registry_enabled_default=False,
@@ -137,7 +137,7 @@ SENSOR_TYPES: tuple[AuroraSensorEntityDescription, ...] = (
     ),
     AuroraSensorEntityDescription(
         key="i_leak_inverter",
-        native_unit_of_measurement=UnitOfCurrent.AMPERE,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         state_class=SensorStateClass.MEASUREMENT,
         translation_key="i_leak_inverter",
         entity_registry_enabled_default=False,
