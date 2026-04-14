@@ -31,7 +31,8 @@
     "error": {
       "cannot_connect": "Connection failed",
       "cannot_open_serial_port": "Serial port could not be opened",
-      "invalid_serial_port": "Serial port is invalid"
+      "invalid_serial_port": "Serial port is invalid",
+      "no_serial_ports": "No serial ports found"
     },
     "abort": {
       "already_configured": "This inverter is already configured",

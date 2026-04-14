@@ -111,6 +111,7 @@ class AuroraAbbDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 self.available = False
                 retries = 0
                 _LOGGER.debug("No response from inverter")
+                raise UpdateFailed("No response from inverter") from None
             except (SerialException, AuroraError) as error:
                 self.available = False
                 retries -= 1
