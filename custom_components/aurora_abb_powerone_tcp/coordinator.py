@@ -7,7 +7,12 @@ import logging
 from time import sleep
 from typing import Any
 
-from aurorapy.client import AuroraError, AuroraSerialClient, AuroraTCPClient, AuroraTimeoutError
+from aurorapy.client import (
+    AuroraError,
+    AuroraSerialClient,
+    AuroraTCPClient,
+    AuroraTimeoutError,
+)
 from serial import SerialException
 
 from homeassistant.config_entries import ConfigEntry
@@ -35,7 +40,7 @@ class AuroraAbbDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         serial_port: str | None = None,
         host: str | None = None,
         tcp_port: int | None = None,
-        timeout: float = 1.0,
+        timeout: float = 3.0,
         scan_interval_seconds: int = 30,
     ) -> None:
         self.available_prev = False
@@ -46,7 +51,7 @@ class AuroraAbbDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self.host = host
         self.tcp_port = tcp_port
         self.timeout = timeout
-        self.client = self._build_client()
+
         super().__init__(
             hass,
             _LOGGER,
@@ -56,6 +61,7 @@ class AuroraAbbDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         )
 
     def _build_client(self):
+        """Create a fresh client instance."""
         if self.protocol == PROTOCOL_TCP:
             return AuroraTCPClient(
                 ip=self.host,
@@ -63,6 +69,7 @@ class AuroraAbbDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 address=self.address,
                 timeout=self.timeout,
             )
+
         return AuroraSerialClient(
             address=self.address,
             port=self.serial_port,
@@ -70,84 +77,93 @@ class AuroraAbbDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             timeout=self.timeout,
         )
 
-    def _close_client(self) -> None:
+    def _close_client(self, client) -> None:
+        """Close a client safely."""
         try:
             if self.protocol == PROTOCOL_TCP:
-                if getattr(self.client, "s", None):
-                    self.client.close()
+                if getattr(client, "s", None):
+                    client.close()
             else:
-                serline = getattr(self.client, "serline", None)
+                serline = getattr(client, "serline", None)
                 if serline is not None and serline.isOpen():
-                    self.client.close()
+                    client.close()
         except Exception:  # noqa: BLE001
             _LOGGER.debug("Ignoring close error", exc_info=True)
 
     def _update_data(self) -> dict[str, Any]:
         """Fetch new state data for all sensors."""
-        data: dict[str, Any] = {}
         self.available_prev = self.available
         retries = 3
+        last_error: Exception | None = None
 
         while retries > 0:
+            client = self._build_client()
             try:
-                self.client.connect()
-                grid_voltage = self.client.measure(1, True)
-                grid_current = self.client.measure(2, True)
-                power_watts = self.client.measure(3, True)
-                frequency = self.client.measure(4)
-                i_leak_dcdc = self.client.measure(6)
-                i_leak_inverter = self.client.measure(7)
-                power_in_1 = self.client.measure(8)
-                power_in_2 = self.client.measure(9)
-                temperature_c = self.client.measure(21)
-                voltage_in_1 = self.client.measure(23)
-                current_in_1 = self.client.measure(25)
-                voltage_in_2 = self.client.measure(26)
-                current_in_2 = self.client.measure(27)
-                r_iso = self.client.measure(30)
-                energy_wh = self.client.cumulated_energy(5)
-                alarm = self.client.alarms()[0]
-            except AuroraTimeoutError:
-                self.available = False
-                retries = 0
-                _LOGGER.debug("No response from inverter")
-                raise UpdateFailed("No response from inverter") from None
-            except (SerialException, AuroraError) as error:
+                client.connect()
+
+                grid_voltage = client.measure(1, True)
+                grid_current = client.measure(2, True)
+                power_watts = client.measure(3, True)
+                frequency = client.measure(4)
+                i_leak_dcdc = client.measure(6)
+                i_leak_inverter = client.measure(7)
+                power_in_1 = client.measure(8)
+                power_in_2 = client.measure(9)
+                temperature_c = client.measure(21)
+                voltage_in_1 = client.measure(23)
+                current_in_1 = client.measure(25)
+                voltage_in_2 = client.measure(26)
+                current_in_2 = client.measure(27)
+                r_iso = client.measure(30)
+                energy_wh = client.cumulated_energy(5)
+                alarm = client.alarms()[0]
+
+                data: dict[str, Any] = {
+                    "grid_voltage": round(grid_voltage, 1),
+                    "grid_current": round(grid_current, 1),
+                    "instantaneouspower": round(power_watts, 1),
+                    "grid_frequency": round(frequency, 1),
+                    "i_leak_dcdc": round(i_leak_dcdc, 3),
+                    "i_leak_inverter": round(i_leak_inverter, 3),
+                    "power_in_1": round(power_in_1, 1),
+                    "power_in_2": round(power_in_2, 1),
+                    "temp": round(temperature_c, 1),
+                    "voltage_in_1": round(voltage_in_1, 1),
+                    "current_in_1": round(current_in_1, 1),
+                    "voltage_in_2": round(voltage_in_2, 1),
+                    "current_in_2": round(current_in_2, 1),
+                    "r_iso": round(r_iso, 3),
+                    "totalenergy": round(energy_wh / 1000, 2),
+                    "alarm": alarm,
+                }
+
+                self.available = True
+
+                if self.available != self.available_prev:
+                    _LOGGER.warning("Communication with %s back online", self.name)
+
+                return data
+
+            except (AuroraTimeoutError, SerialException, AuroraError) as error:
+                last_error = error
                 self.available = False
                 retries -= 1
-                if retries <= 0:
-                    raise UpdateFailed(error) from error
-                _LOGGER.debug("Aurora exception %r, %d retries remaining", error, retries)
-                sleep(1)
-            else:
-                data["grid_voltage"] = round(grid_voltage, 1)
-                data["grid_current"] = round(grid_current, 1)
-                data["instantaneouspower"] = round(power_watts, 1)
-                data["grid_frequency"] = round(frequency, 1)
-                data["i_leak_dcdc"] = round(i_leak_dcdc, 3)
-                data["i_leak_inverter"] = round(i_leak_inverter, 3)
-                data["power_in_1"] = round(power_in_1, 1)
-                data["power_in_2"] = round(power_in_2, 1)
-                data["temp"] = round(temperature_c, 1)
-                data["voltage_in_1"] = round(voltage_in_1, 1)
-                data["current_in_1"] = round(current_in_1, 1)
-                data["voltage_in_2"] = round(voltage_in_2, 1)
-                data["current_in_2"] = round(current_in_2, 1)
-                data["r_iso"] = round(r_iso, 3)
-                data["totalenergy"] = round(energy_wh / 1000, 2)
-                data["alarm"] = alarm
-                self.available = True
-                retries = 0
+
+                if retries > 0:
+                    _LOGGER.debug(
+                        "Aurora communication error %r, %d retries remaining",
+                        error,
+                        retries,
+                    )
+                    sleep(1)
+
             finally:
-                self._close_client()
+                self._close_client(client)
 
         if self.available != self.available_prev:
-            if self.available:
-                _LOGGER.warning("Communication with %s back online", self.name)
-            else:
-                _LOGGER.warning("Communication with %s lost", self.name)
+            _LOGGER.warning("Communication with %s lost", self.name)
 
-        return data
+        raise UpdateFailed(f"No response from inverter: {last_error}") from last_error
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Update inverter data in the executor."""
@@ -155,4 +171,4 @@ class AuroraAbbDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     async def async_shutdown(self) -> None:
         """Shutdown the coordinator cleanly."""
-        await self.hass.async_add_executor_job(self._close_client)
+        return
